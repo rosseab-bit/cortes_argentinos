@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.gitignore
+.env*
+!.env.example
+coverage
+*.tsbuildinfo
+data/*.db
+data/*.db-shm
+data/*.db-wal
