@@ -1,34 +1,39 @@
-import Link from "next/link";
-import type { CorteDetalle, Zona } from "../lib/types";
+"use client";
 
-const zonaNombre: Record<Zona, string> = {
-  delantera: "Cuarto delantero",
-  media: "Zona media",
-  trasera: "Cuarto trasero",
-  costado: "Costado",
-  cabeza: "Cabeza y otros"
+import Link from "next/link";
+import { translate } from "../lib/i18n";
+import type { CorteDetalle, Zona } from "../lib/types";
+import { useLocale } from "./LocaleProvider";
+
+const zonaKey: Record<Zona, "zoneFront" | "zoneMiddle" | "zoneRear" | "zoneSide" | "zoneOther"> = {
+  delantera: "zoneFront",
+  media: "zoneMiddle",
+  trasera: "zoneRear",
+  costado: "zoneSide",
+  cabeza: "zoneOther"
 };
 
 type CortePanelProps = { corte: CorteDetalle; standalone?: boolean };
 
 export function CortePanel({ corte, standalone = false }: CortePanelProps) {
+  const { locale } = useLocale();
   return (
     <article className={`corte-detail zone-${corte.zona}${standalone ? " standalone-detail" : ""}`}>
       <div className="detail-heading">
         <div>
-          <span className="zone-kicker"><span className="legend-dot" aria-hidden="true" />{zonaNombre[corte.zona]}</span>
+          <span className="zone-kicker"><span className="legend-dot" aria-hidden="true" />{translate(locale, zonaKey[corte.zona])}</span>
           <h2>{corte.nombre}</h2>
         </div>
-        {!standalone && <Link href={`/cortes/${corte.slug}`} className="share-link" aria-label={`Abrir página de ${corte.nombre}`}>↗</Link>}
+        {!standalone && <Link href={`/cortes/${corte.slug}`} className="share-link" aria-label={`${translate(locale, "detailOpen")} ${corte.nombre}`}>↗</Link>}
       </div>
       <p className="detail-description">{corte.descripcion}</p>
       <dl className="detail-facts">
-        <div><dt>Textura</dt><dd>{corte.textura ?? "Consultar en carnicería"}</dd></div>
-        <div><dt>Ideal para</dt><dd>{corte.coccion ?? "Preparaciones variadas"}</dd></div>
-        {corte.precio_ref && <div><dt>Precio de referencia</dt><dd>{corte.precio_ref}</dd></div>}
+        <div><dt>{translate(locale, "texture")}</dt><dd>{corte.textura ?? translate(locale, "askButcher")}</dd></div>
+        <div><dt>{translate(locale, "cooking")}</dt><dd>{corte.coccion ?? translate(locale, "variousPreparations")}</dd></div>
+        {corte.precio_ref && <div><dt>{translate(locale, "priceReference")}</dt><dd>{corte.precio_ref}</dd></div>}
       </dl>
       <div className="uses-heading">
-        <div><span className="eyebrow">En la cocina</span><h3>Ideas para prepararlo</h3></div>
+        <div><span className="eyebrow">{translate(locale, "inKitchen")}</span><h3>{translate(locale, "ideas")}</h3></div>
         <span className="uses-count">{String(corte.usos.length).padStart(2, "0")}</span>
       </div>
       <ul className="uses-list">
@@ -39,7 +44,7 @@ export function CortePanel({ corte, standalone = false }: CortePanelProps) {
           </li>
         ))}
       </ul>
-      {standalone && <p className="detail-footnote">Los tiempos son orientativos; pueden variar según el grosor, el equipo y el punto de cocción.</p>}
+      {standalone && <p className="detail-footnote">{translate(locale, "timeNote")}</p>}
     </article>
   );
 }

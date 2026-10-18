@@ -60,6 +60,10 @@ describe("API de cortes", () => {
     const body = (await response.json()) as { cortes: Array<{ nombre: string }> };
     expect(response.status).toBe(200);
     expect(body.cortes.map(({ nombre }) => nombre)).toEqual(["Nalga", "Tapa de nalga"]);
+
+    const english = GET(new Request("http://localhost/api/cortes?locale=en&q=tenderloin"));
+    const englishBody = (await (await english).json()) as { cortes: Array<{ nombre: string }> };
+    expect(englishBody.cortes.map(({ nombre }) => nombre)).toEqual(["Tenderloin"]);
   });
 
   it("responde el detalle y un 404 para un slug inexistente", async () => {
@@ -70,5 +74,17 @@ describe("API de cortes", () => {
     expect(foundBody.corte.usos.length).toBeGreaterThanOrEqual(2);
     const missing = await GET(new Request("http://localhost/api/cortes/no-existe"), { params: Promise.resolve({ slug: "no-existe" }) });
     expect(missing.status).toBe(404);
+  });
+
+  it("devuelve el detalle traducido según el locale solicitado", async () => {
+    const { GET } = await import("../app/api/cortes/[slug]/route");
+    const english = await GET(new Request("http://localhost/api/cortes/lomo?locale=en"), { params: Promise.resolve({ slug: "lomo" }) });
+    const englishBody = (await english.json()) as { corte: { nombre: string; usos: Array<{ detalle: string }> } };
+    expect(englishBody.corte.nombre).toBe("Tenderloin");
+    expect(englishBody.corte.usos[0].detalle).toContain("Sear");
+
+    const portuguese = await GET(new Request("http://localhost/api/cortes/lomo?locale=pt"), { params: Promise.resolve({ slug: "lomo" }) });
+    const portugueseBody = (await portuguese.json()) as { corte: { nombre: string } };
+    expect(portugueseBody.corte.nombre).toBe("Filé-mignon");
   });
 });

@@ -17,6 +17,8 @@ npm run dev
 
 Abrí [http://localhost:3000](http://localhost:3000). La base SQLite se crea en `data/cortes.db`; se puede cambiar la ubicación definiendo `CORTES_DB_PATH` con una ruta absoluta. El seed es idempotente: vuelve a cargar el catálogo y sus usos.
 
+La interfaz está disponible en español, inglés y portugués. El selector de idioma aparece en el encabezado y la preferencia se conserva en una cookie del navegador.
+
 ## Docker
 
 La imagen inicia únicamente la aplicación Next.js en el puerto `3020`. `docker-compose.yml` publica el puerto solo en `127.0.0.1`, para que un Nginx instalado en el host pueda actuar como proxy inverso:
@@ -33,7 +35,7 @@ La aplicación queda disponible localmente en `http://127.0.0.1:3020`. Compose c
 docker compose down
 ```
 
-La configuración de Nginx es independiente de Docker y está en [`nginx/cortes-argentinos.conf`](./nginx/cortes-argentinos.conf). Copiala a la configuración de sitios de Nginx del host, reemplazá `cortes.example.com` por tu dominio y luego validá y recargá Nginx:
+La configuración de Nginx es independiente de Docker y está en [`nginx/cortes-argentinos.conf`](./nginx/cortes-argentinos.conf); está configurada para `cortefino.fyi`. Copiala a la configuración de sitios de Nginx del host y luego validá y recargá Nginx:
 
 ```bash
 sudo nginx -t
@@ -56,10 +58,12 @@ El archivo de Nginx hace proxy a `127.0.0.1:3020`; no agrega Nginx al contenedor
 
 ## Datos y API
 
-- `GET /api/cortes`: devuelve el catálogo; acepta `?q=nalga` para filtrar por nombre.
-- `GET /api/cortes/:slug`: devuelve un corte y sus usos; responde 404 si no existe.
+- `GET /api/cortes`: devuelve el catálogo; acepta `?q=nalga` para filtrar por nombre y `?locale=en` o `?locale=pt` para localizarlo.
+- `GET /api/cortes/:slug`: devuelve un corte y sus usos; acepta `?locale=en` o `?locale=pt` y responde 404 si no existe.
 - `/cortes/:slug`: página compartible con metadatos SEO.
 - `/mapa`: vista independiente del mapa lateral con todos los cortes, sin panel de detalle.
+- El endpoint de detalle acepta `?locale=en` o `?locale=pt` para devolver la ficha traducida; sin parámetro responde en español.
+- El sitio publica metadatos canónicos y Open Graph para `https://cortefino.fyi`, además de `/robots.txt` y `/sitemap.xml`.
 
 El esquema vive en `db/schema.ts`, el catálogo inicial en `db/seed-data.ts` y las consultas en `lib/cortes.ts`.
 

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { translate, translateCorte } from "../lib/i18n";
 import type { Corte, Zona } from "../lib/types";
+import { useLocale } from "./LocaleProvider";
 
 type Shape = {
   slug: string;
@@ -41,12 +43,12 @@ const shapes: Shape[] = [
   { slug: "cola", path: "M 1152 198 Q 1182 205 1183 235 L 1171 320 Q 1163 360 1182 391 L 1176 401 Q 1155 382 1156 348 L 1168 260 Q 1171 224 1150 212 Z", x: 1168, y: 344, head: true }
 ];
 
-const zoneLabels: Array<{ key: Zona; label: string }> = [
-  { key: "delantera", label: "Delantera" },
-  { key: "media", label: "Media" },
-  { key: "trasera", label: "Trasera" },
-  { key: "costado", label: "Costado" },
-  { key: "cabeza", label: "Cabeza y otros" }
+const zoneLabels: Array<{ key: Zona; message: "legendFront" | "legendMiddle" | "legendRear" | "legendSide" | "legendOther" }> = [
+  { key: "delantera", message: "legendFront" },
+  { key: "media", message: "legendMiddle" },
+  { key: "trasera", message: "legendRear" },
+  { key: "costado", message: "legendSide" },
+  { key: "cabeza", message: "legendOther" }
 ];
 
 function wrapLabel(name: string): string[] {
@@ -73,7 +75,8 @@ type CowMapProps = {
 
 export function CowMap({ cortes, selectedSlug, highlightedSlug, onSelect }: CowMapProps) {
   const [hovered, setHovered] = useState<string | null>(null);
-  const cortesBySlug = new Map(cortes.map((corte) => [corte.slug, corte]));
+  const { locale } = useLocale();
+  const cortesBySlug = new Map(cortes.map((corte) => [corte.slug, translateCorte(corte, locale)]));
   const activeShape = shapes.find(({ slug }) => slug === hovered);
   const activeCorte = activeShape ? cortesBySlug.get(activeShape.slug) : undefined;
   const selectedCorte = selectedSlug ? cortesBySlug.get(selectedSlug) : undefined;
@@ -123,7 +126,7 @@ export function CowMap({ cortes, selectedSlug, highlightedSlug, onSelect }: CowM
         }}
         role="button"
         tabIndex={0}
-        aria-label={`${corte.nombre}, zona ${corte.zona}`}
+        aria-label={`${corte.nombre}, ${translate(locale, "zoneIndicator")} ${translate(locale, zoneLabels.find(({ key }) => key === corte.zona)?.message ?? "legendOther")}`}
         aria-pressed={isSelected}
         data-slug={corte.slug}
       >
@@ -137,7 +140,7 @@ export function CowMap({ cortes, selectedSlug, highlightedSlug, onSelect }: CowM
     <div className="map-frame">
       <div className="map-svg-wrap">
         {selectedCorte && <span className="map-selected-chip" aria-live="polite">{selectedCorte.nombre}</span>}
-        <svg className="cow-map" viewBox="0 0 1200 720" role="group" aria-label="Mapa interactivo lateral de los cortes vacunos argentinos" preserveAspectRatio="xMidYMid meet">
+        <svg className="cow-map" viewBox="0 0 1200 720" role="group" aria-label={translate(locale, "cowMapAria")} preserveAspectRatio="xMidYMid meet">
           <defs>
             <clipPath id="cow-body-clip">
               <path d="M 213 171 C 236 139 287 127 343 139 C 397 140 441 150 489 158 C 547 169 600 177 651 176 C 704 176 753 169 802 157 C 856 143 905 125 954 108 C 1009 90 1060 100 1099 126 C 1137 151 1155 189 1159 235 C 1165 291 1152 350 1127 397 C 1106 436 1070 458 1027 466 C 975 476 922 459 869 449 C 802 437 744 452 680 459 C 610 466 553 458 495 465 C 447 466 411 449 376 432 C 341 417 311 400 286 365 C 258 330 229 294 216 250 C 205 218 201 190 213 171 Z" />
@@ -181,7 +184,7 @@ export function CowMap({ cortes, selectedSlug, highlightedSlug, onSelect }: CowM
           {shapes.filter(({ slug }) => slug === "lengua").map(renderRegion)}
           {shapes.filter(({ slug }) => slug === "cola").map(renderRegion)}
           <g className="map-region-labels">{shapes.map(renderLabel)}</g>
-          <text className="map-caption" x="37" y="710">MAPA DE CORTES · VISTA LATERAL</text>
+          <text className="map-caption" x="37" y="710">{translate(locale, "sideViewCaption")}</text>
           {activeShape && activeCorte && (
             <g className="map-tooltip" pointerEvents="none">
               <rect x={activeShape.x - Math.max(42, activeCorte.nombre.length * 4.5)} y={activeShape.y - 37} width={Math.max(84, activeCorte.nombre.length * 9)} height="25" rx="12.5" />
@@ -191,11 +194,11 @@ export function CowMap({ cortes, selectedSlug, highlightedSlug, onSelect }: CowM
         </svg>
       </div>
       <div className="map-legend" aria-label="Referencias por zona">
-        {zoneLabels.map(({ key, label }) => (
-          <span className={`legend-item zone-${key}`} key={key}><span className="legend-dot" aria-hidden="true" />{label}</span>
+        {zoneLabels.map(({ key, message }) => (
+          <span className={`legend-item zone-${key}`} key={key}><span className="legend-dot" aria-hidden="true" />{translate(locale, message)}</span>
         ))}
       </div>
-      <p className="map-hint">Seleccioná una región para descubrir el corte</p>
+      <p className="map-hint">{translate(locale, "chooseCut")}</p>
     </div>
   );
 }

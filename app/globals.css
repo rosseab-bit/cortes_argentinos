@@ -71,6 +71,21 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 }
 .topbar-note { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 12px; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #8d9c63; }
+.topbar-actions, .map-only-header-actions, .detail-topbar-actions { display: flex; align-items: center; gap: 20px; }
+.topbar-actions { gap: 14px; }
+.language-selector select {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 7px 26px 7px 9px;
+  background: var(--papel);
+  color: var(--tinta);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.language-selector select:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.hero-stamp small { max-width: 90px; }
+.not-found-actions { position: absolute; top: 24px; right: 24px; }
 .topbar-link { color: var(--cuero); font-size: 12px; font-weight: 600; }
 .topbar-link span { margin-left: 7px; color: var(--acento); }
 
@@ -349,7 +364,9 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   .brand { gap: 8px; font-size: 14px; }
   .brand-mark { width: 30px; height: 30px; font-size: 12px; }
   .topbar-note { display: none; }
-  .topbar-link { font-size: 10px; }
+  .topbar-actions, .map-only-header-actions, .detail-topbar-actions { gap: 8px; }
+  .topbar-link, .back-link { font-size: 10px; }
+  .language-selector select { padding: 6px 21px 6px 6px; font-size: 10px; }
   .hero { min-height: 250px; align-items: flex-start; padding: 33px 2px 27px; }
   .hero::after { width: 240px; height: 240px; top: -155px; right: -28px; }
   .hero h1 { margin-top: 16px; font-size: clamp(44px, 12vw, 58px); }
@@ -404,6 +421,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   .mobile-sheet .uses-list li p { font-size: 10px; }
   .map-only-page { padding-inline: 13px; }
   .map-only-header { height: 59px; }
+  .map-only-header .brand { font-size: 12px; }
+  .map-only-header-actions .back-link { font-size: 9px; }
   .map-only-content { margin: 29px auto 45px; }
   .map-only-title { align-items: start; flex-direction: column; margin: 0 2px 15px; }
   .map-only-title .eyebrow { font-size: 7px; }
@@ -417,6 +436,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   .region-label { font-size: 17px; stroke-width: 3px; }
   .map-card .region-label, .map-only-card .region-label { display: none; }
   .detail-topbar { width: calc(100% - 36px); height: 59px; }
+  .detail-topbar-actions { gap: 8px; }
   .detail-page-content { width: calc(100% - 36px); margin: 30px auto 55px; }
   .standalone-detail { padding: 25px 20px; }
   .standalone-detail .detail-heading h2 { font-size: 35px; }
